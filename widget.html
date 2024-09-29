@@ -2,61 +2,88 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Updated Form</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Huma Support Widget</title>
 </head>
 <body>
-  <p>Hey</p>
+  <!-- Include the Extensions Script -->
+  <script src="https://swnevin.github.io/voiceflow-huma-assets/extensions.js"></script>
 
-  <!-- Include the extensions script -->
-  <script src="extensions.js"></script>
+  <!-- Configuration Section -->
+  <script>
+    /**
+     * ============================
+     * Configuration Section
+     * ============================
+     * 
+     * Huma can adjust the widget settings below.
+     * 
+     * 1. Theme Settings:
+     *    - darkMode: Set to `true` for Dark Mode, `false` for Light Mode.
+     * 
+     * 2. Language Settings:
+     *    - language: Choose from 'EN' (English), 'NB' (Norwegian Bokmål), 
+     *                'SV' (Swedish), 'FI' (Finnish).
+     *    - descriptions: Update the welcome message for each supported language.
+     * 
+     * 3. Project Details:
+     *    - projectID: The Voiceflow project ID.
+     *    - versionID: The version of the project to use (e.g., 'development', 'production').
+     * 
+     * 4. User Information:
+     *    - user: Pre-fill user information for the launch event.
+     */
 
-  <!-- Widget Initialization with Dark Mode and Language Support -->
-  <script type="text/javascript">
-    // Define the darkMode variable
-    const darkMode = true; // Set to true for Dark Mode, false otherwise
+    const widgetConfig = {
+      // 1. Theme Settings
+      darkMode: true, // `true` for Dark Mode, `false` for Light Mode
 
-    // Define the widgetLanguage variable
-    // Options: 'EN' (English), 'NB' (Norwegian Bokmål), 'SV' (Swedish), 'FI' (Finnish)
-    const widgetLanguage = 'EN'; // Change this value to switch languages
+      // 2. Language Settings
+      language: 'EN', // Supported languages: 'EN', 'NB', 'SV', 'FI'
+      descriptions: {
+        'EN': "Hi 👋 I'm Huma's first step in support. I'm still learning—need help? Just ask!",
+        'NB': "Hei 👋 Jeg er Humas første steg i support. Lærer fortsatt—trenger du hjelp? Bare spør!",
+        'SV': "Hej 👋 Jag är Humas första steg i supporten. Lär mig fortfarande—behöver du hjälp? Fråga bara!",
+        'FI': "Moi 👋 Oon Humas eka askel tuessa. Opettelen vielä—tarviitko apua? Kysy vaan!"
+      },
 
-    // Mapping of widgetLanguage to descriptions
-    const descriptions = {
-      'EN': "Hi 👋 I'm Huma's first step in support. I'm still learning—need help? Just ask!",
-      'NB': "Hei 👋 Jeg er Humas første steg i support. Lærer fortsatt—trenger du hjelp? Bare spør!",
-      'SV': "Hej 👋 Jag är Humas första steg i supporten. Lär mig fortfarande—behöver du hjälp? Fråga bara!",
-      'FI': "Moi 👋 Oon Humas eka askel tuessa. Opettelen vielä—tarviitko apua? Kysy vaan!"
+      // 3. Project Details
+      projectID: '66ec4578a5094822528ff468', 
+      versionID: 'production', // e.g., 'development', 'production'
+
+      // 4. User Information
+      user: {
+        name: "Ola Nordmann",
+        email: "ola@nordmann.no"
+      }
     };
+  </script>
 
-    // Validate widgetLanguage and set default to 'EN' if invalid
-    const selectedLanguage = descriptions[widgetLanguage] ? widgetLanguage : 'EN';
-    const widgetDescription = descriptions[selectedLanguage];
-
+  <!-- Widget Initialization Script -->
+  <script type="text/javascript">
     (function(d, t) {
       var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
       v.onload = function() {
-        // Define the default stylesheet URL
-        const defaultStylesheet = "stylesheet for font and that";
+        // Destructure configuration for easy access
+        const { darkMode, language, descriptions, projectID, versionID, user } = widgetConfig;
 
-        // Define the dark stylesheet URL
-        const darkStylesheet = "dark stylesheet url or something like that";
+        // Select the appropriate language description
+        const widgetDescription = descriptions[language] || descriptions['EN'];
 
-        // Initialize the stylesheet variable with the default stylesheet
-        let combinedStylesheet = defaultStylesheet;
-
-        // If darkMode is true, append the dark stylesheet
+        // Declare stylesheet
+        let stylesheet = "https://swnevin.github.io/voiceflow-huma-assets/default.css";
+        
         if (darkMode) {
-          combinedStylesheet += "," + darkStylesheet;
+          stylesheet = "https://swnevin.github.io/voiceflow-huma-assets/dark.css";
         }
 
+        // Initialize the Voiceflow chat widget with additional configurations
         window.voiceflow.chat.load({
-          verify: { projectID: '66ec4578a5094822528ff468' },
+          verify: { projectID: projectID },
           url: 'https://general-runtime.voiceflow.com',
           assistant: {
-            // Set the description based on the selected language
             description: widgetDescription,
-            // Apply combined stylesheets
-            stylesheet: combinedStylesheet,
+            stylesheet: stylesheet,
             extensions: [ 
               FormExtension,
               FileUploadExtension,
@@ -64,14 +91,14 @@
               VideoExtension
             ]
           },
-          versionID: 'development',
+          versionID: versionID,
           launch: {
             event: {
               type: "launch",
               payload: {
-                user_name: "Ola Nordmann",
-                user_email: "ola@nordmann.no",
-                flowLanguage: selectedLanguage.toLowerCase() // e.g., 'en', 'nb', 'sv', 'fi'
+                user_name: user.name,
+                user_email: user.email,
+                flowLanguage: language.toLowerCase() // e.g., 'en', 'nb', 'sv', 'fi'
               }
             }
           }
