@@ -1,3 +1,6 @@
+:host {
+  --fonts-default: inherit;
+}
 .vfrc-launcher {
 	background-color: #484848;
 }
