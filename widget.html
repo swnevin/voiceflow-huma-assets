@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Updated Form</title>
+</head>
+<body>
+  <p>Hey</p>
+
+  <!-- Include the extensions script -->
+  <script src="extensions.js"></script>
+
+  <!-- Widget Initialization with Dark Mode and Language Support -->
+  <script type="text/javascript">
+    // Define the darkMode variable
+    const darkMode = true; // Set to true for Dark Mode, false otherwise
+
+    // Define the widgetLanguage variable
+    // Options: 'EN' (English), 'NB' (Norwegian Bokmål), 'SV' (Swedish), 'FI' (Finnish)
+    const widgetLanguage = 'EN'; // Change this value to switch languages
+
+    // Mapping of widgetLanguage to descriptions
+    const descriptions = {
+      'EN': "Hi 👋 I'm Huma's first step in support. I'm still learning—need help? Just ask!",
+      'NB': "Hei 👋 Jeg er Humas første steg i support. Lærer fortsatt—trenger du hjelp? Bare spør!",
+      'SV': "Hej 👋 Jag är Humas första steg i supporten. Lär mig fortfarande—behöver du hjälp? Fråga bara!",
+      'FI': "Moi 👋 Oon Humas eka askel tuessa. Opettelen vielä—tarviitko apua? Kysy vaan!"
+    };
+
+    // Validate widgetLanguage and set default to 'EN' if invalid
+    const selectedLanguage = descriptions[widgetLanguage] ? widgetLanguage : 'EN';
+    const widgetDescription = descriptions[selectedLanguage];
+
+    (function(d, t) {
+      var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
+      v.onload = function() {
+        // Define the default stylesheet URL
+        const defaultStylesheet = "stylesheet for font and that";
+
+        // Define the dark stylesheet URL
+        const darkStylesheet = "dark stylesheet url or something like that";
+
+        // Initialize the stylesheet variable with the default stylesheet
+        let combinedStylesheet = defaultStylesheet;
+
+        // If darkMode is true, append the dark stylesheet
+        if (darkMode) {
+          combinedStylesheet += "," + darkStylesheet;
+        }
+
+        window.voiceflow.chat.load({
+          verify: { projectID: '66ec4578a5094822528ff468' },
+          url: 'https://general-runtime.voiceflow.com',
+          assistant: {
+            // Set the description based on the selected language
+            description: widgetDescription,
+            // Apply combined stylesheets
+            stylesheet: combinedStylesheet,
+            extensions: [ 
+              FormExtension,
+              FileUploadExtension,
+              DisableInputExtension,
+              VideoExtension
+            ]
+          },
+          versionID: 'development',
+          launch: {
+            event: {
+              type: "launch",
+              payload: {
+                user_name: "Ola Nordmann",
+                user_email: "ola@nordmann.no",
+                flowLanguage: selectedLanguage.toLowerCase() // e.g., 'en', 'nb', 'sv', 'fi'
+              }
+            }
+          }
+        });
+      };
+      v.src = "https://cdn.voiceflow.com/widget/bundle.mjs";
+      v.type = "text/javascript";
+      s.parentNode.insertBefore(v, s);
+    })(document, 'script');
+  </script>
+</body>
+</html>

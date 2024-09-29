@@ -1,0 +1,85 @@
+.vfrc-launcher {
+	background-color: #484848;
+}
+.vfrc-launcher:hover {
+	background-color: #000000;
+}
+
+.vfrc-chat {
+	background-color: #484848;
+}
+
+.vfrc-widget--chat {
+	max-height: 100% !important;
+}
+
+.vfrc-header,
+.vfrc-footer {
+	background-color: #000000;
+}
+
+::-webkit-scrollbar {
+	border-left: 1px solid #000000;
+}
+
+::-webkit-scrollbar-thumb {
+	background-color: rgba(0, 0, 0, 0.3);
+}
+
+.vfrc-assistant-info--title {
+	color: #ffffff;
+}
+
+.vfrc-assistant-info--description,
+.vfrc-chat--session-time,
+.vfrc-timestamp,
+.vfrc-footer--watermark {
+	color: rgba(255, 255, 255, 0.8);
+}
+.vfrc-assistant-info--description a,
+.vfrc-chat--session-time a,
+.vfrc-timestamp a,
+.vfrc-footer--watermark a {
+	color: #ffffff;
+}
+
+.vfrc-user-response .vfrc-message {
+	background-color: #000000;
+}
+
+.vfrc-button--secondary {
+	background-color: #efefef;
+	color: #000000;
+	border-color: gray;
+}
+
+.vfrc-button--secondary:hover {
+	font-weight: 700;
+	border-color: black;
+}
+
+.vfrc-footer button.vfrc-button {
+	position: relative;
+	background-color: darkgreen !important;
+}
+.vfrc-footer button.vfrc-button::after {
+	position: absolute;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	inset: 0;
+	color: #ffffff;
+}
+.vfrc-footer .vfrc-chat-input--button .vfrc-bubble {
+	background-color: #aa0000;
+}
+
+.vfrc-prompt {
+	background-color: #000000;
+}
+.vfrc-prompt button {
+	color: #ffffff;
+}
+.vfrc-prompt button:hover {
+	color: #efefef;
+}
