@@ -1,0 +1,112 @@
+//lim inn denne kodesnutten i konsollen på nettsiden for å teste, uten å måtte endre noen kode. Brukes som en preview. 
+
+(function(d, t) {
+  /**
+   * Utility function to load external scripts dynamically.
+   * @param {string} src - The source URL of the script to load.
+   * @returns {Promise} - Resolves when the script is successfully loaded, rejects on error.
+   */
+  function loadScript(src) {
+    return new Promise(function(resolve, reject) {
+      var script = d.createElement(t);
+      script.src = src;
+      script.type = "text/javascript";
+      script.async = true;
+      script.onload = function() {
+        console.log(`Successfully loaded script: ${src}`);
+        resolve();
+      };
+      script.onerror = function() {
+        reject(new Error(`Failed to load script: ${src}`));
+      };
+      d.getElementsByTagName(t)[0].parentNode.insertBefore(script, d.getElementsByTagName(t)[0]);
+    });
+  }
+
+  /**
+   * Configuration object for the Voiceflow widget.
+   */
+  const widgetConfig = {
+    // 1. Theme Settings
+    darkMode: true, // `true` for Dark Mode, `false` for Light Mode
+
+    // 2. Language Settings
+    language: 'EN', // Supported languages: 'EN', 'NB', 'SV', 'FI'
+    descriptions: {
+      'EN': "Hi 👋 I'm Huma's first step in support. I'm still learning—need help? Just ask!",
+      'NB': "Hei 👋 Jeg er Humas første steg i support. Lærer fortsatt—trenger du hjelp? Bare spør!",
+      'SV': "Hej 👋 Jag är Humas första steg i supporten. Lär mig fortfarande—behöver du hjälp? Fråga bara!",
+      'FI': "Moi 👋 Oon Humas eka askel tuessa. Opettelen vielä—tarviitko apua? Kysy vaan!"
+    },
+
+    // 3. Project Details
+    projectID: '66ec4578a5094822528ff468', 
+    versionID: 'production', // e.g., 'development', 'production'
+
+    // 4. User Information
+    user: {
+      name: "Ola Nordmann",
+      email: "ola@nordmann.no"
+    }
+  };
+
+  /**
+   * Initializes the Voiceflow widget after all dependencies are loaded.
+   */
+  function initializeWidget() {
+    if (window.voiceflow && window.voiceflow.chat) {
+      window.voiceflow.chat.load({
+        verify: { projectID: widgetConfig.projectID },
+        url: 'https://general-runtime.voiceflow.com',
+        assistant: {
+          description: widgetConfig.descriptions[widgetConfig.language] || widgetConfig.descriptions['EN'],
+          stylesheet: widgetConfig.darkMode 
+            ? "https://swnevin.github.io/voiceflow-huma-assets/humaDark.css"
+            : "https://swnevin.github.io/voiceflow-huma-assets/default.css",
+          extensions: [ 
+            FormExtension,
+            FileUploadExtension,
+            DisableInputExtension,
+            VideoExtension
+          ]
+        },
+        versionID: widgetConfig.versionID,
+        launch: {
+          event: {
+            type: "launch",
+            payload: {
+              user_name: widgetConfig.user.name,
+              user_email: widgetConfig.user.email,
+              flowLanguage: widgetConfig.language.toLowerCase() // e.g., 'en', 'nb', 'sv', 'fi'
+            }
+          }
+        }
+      });
+      console.log("Voiceflow widget initialized successfully.");
+    } else {
+      console.error("Voiceflow chat object is not available.");
+    }
+  }
+
+  /**
+   * Main function to load dependencies and initialize the widget.
+   */
+  async function loadDependenciesAndInitialize() {
+    try {
+      // Step 1: Load Extensions Script
+      await loadScript("https://swnevin.github.io/voiceflow-huma-assets/extensions.js");
+
+      // Step 2: Load Voiceflow Widget Script
+      await loadScript("https://cdn.voiceflow.com/widget/bundle.mjs");
+
+      // Step 3: Initialize the Widget
+      initializeWidget();
+    } catch (error) {
+      console.error("Error loading scripts:", error);
+    }
+  }
+
+  // Start the process
+  loadDependenciesAndInitialize();
+
+})(document, 'script');
