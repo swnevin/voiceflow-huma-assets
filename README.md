@@ -11,7 +11,9 @@ Files
 - widget.html: The main HTML file that integrates the chatbot with Voiceflow and includes dynamic language and theme support.
 - extensions.js: Contains the custom extensions for the chatbot (e.g., video handling, file uploads).
 - default.css: Default stylesheet for the widget (fonts, colors, etc.).
-- dark.css: Dark mode stylesheet for the widget.
+- humaDark.css: Dark mode stylesheet for the widget.
+- consoleTest: use this to test the chatbot in the console
+
 
 Setup Instructions
 Follow instructions in widget.html
