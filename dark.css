@@ -1,15 +1,21 @@
 :host {
   --fonts-default: inherit;
+  --brand-color: #953765;  /* Humas main brand color */
+  --dark-background: #262626; /* Dashboard background color like black */
+  --light-gray: #303030; /* Lighter dashboard color used for side panels */
+  --font-color: #FAFAF9; /* Font color for dark mode */
 }
+
 .vfrc-launcher {
-	background-color: #484848;
+	background-color: var(--dark-background);
 }
+
 .vfrc-launcher:hover {
-	background-color: #000000;
+	background-color: var(--brand-color);
 }
 
 .vfrc-chat {
-	background-color: #484848;
+	background-color: var(--dark-background);
 }
 
 .vfrc-widget--chat {
@@ -18,52 +24,52 @@
 
 .vfrc-header,
 .vfrc-footer {
-	background-color: #000000;
+	background-color: var(--brand-color);
 }
 
 ::-webkit-scrollbar {
-	border-left: 1px solid #000000;
+	border-left: 1px solid var(--brand-color);
 }
 
 ::-webkit-scrollbar-thumb {
-	background-color: rgba(0, 0, 0, 0.3);
+	background-color: rgba(149, 54, 101, 0.3); /* Opacity added to the brand color */
 }
 
 .vfrc-assistant-info--title {
-	color: #ffffff;
+	color: var(--font-color);
 }
 
 .vfrc-assistant-info--description,
 .vfrc-chat--session-time,
 .vfrc-timestamp,
 .vfrc-footer--watermark {
-	color: rgba(255, 255, 255, 0.8);
+	color: rgba(250, 250, 249, 0.8); /* Font color with reduced opacity */
 }
 .vfrc-assistant-info--description a,
 .vfrc-chat--session-time a,
 .vfrc-timestamp a,
 .vfrc-footer--watermark a {
-	color: #ffffff;
+	color: var(--font-color);
 }
 
 .vfrc-user-response .vfrc-message {
-	background-color: #000000;
+	background-color: var(--dark-background);
 }
 
 .vfrc-button--secondary {
-	background-color: #efefef;
-	color: #000000;
-	border-color: gray;
+	background-color: var(--light-gray);
+	color: var(--font-color);
+	border-color: var(--brand-color);
 }
 
 .vfrc-button--secondary:hover {
 	font-weight: 700;
-	border-color: black;
+	border-color: var(--brand-color);
 }
 
 .vfrc-footer button.vfrc-button {
 	position: relative;
-	background-color: darkgreen !important;
+	background-color: var(--brand-color) !important;
 }
 .vfrc-footer button.vfrc-button::after {
 	position: absolute;
@@ -71,17 +77,17 @@
 	align-items: center;
 	justify-content: center;
 	inset: 0;
-	color: #ffffff;
+	color: var(--font-color);
 }
 .vfrc-footer .vfrc-chat-input--button .vfrc-bubble {
-	background-color: #aa0000;
+	background-color: var(--brand-color);
 }
 
 .vfrc-prompt {
-	background-color: #000000;
+	background-color: var(--brand-color);
 }
 .vfrc-prompt button {
-	color: #ffffff;
+	color: var(--font-color);
 }
 .vfrc-prompt button:hover {
 	color: #efefef;
