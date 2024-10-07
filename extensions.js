@@ -296,3 +296,10 @@ const FormExtension = {
     element.appendChild(formContainer);
   },
 };
+
+window.voiceflowExtensions = [
+    VideoExtension,
+    DisableInputExtension,
+    FileUploadExtension,
+    FormExtension
+];
