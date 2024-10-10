@@ -297,9 +297,50 @@ const FormExtension = {
   },
 };
 
+function loadConfettiLibrary(callback) {
+  if (window.confetti) {
+    // Confetti library is already loaded, execute the callback
+    callback();
+  } else {
+    // Dynamically load the confetti library
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js';
+    script.onload = callback;
+    document.head.appendChild(script);
+  }
+}
+
+export const ConfettiExtension = {
+  name: 'Confetti',
+  type: 'effect',
+  match: ({ trace }) =>
+    trace.type === 'ext_confetti' || trace.payload.name === 'ext_confetti',
+  effect: ({ trace }) => {
+    loadConfettiLibrary(() => {
+      const canvas = document.querySelector('#confetti-canvas') || document.createElement('canvas');
+      if (!canvas.parentNode) {
+        // Create the canvas if it doesn't exist
+        canvas.id = 'confetti-canvas';
+        document.body.appendChild(canvas);
+      }
+
+      const myConfetti = confetti.create(canvas, {
+        resize: true,
+        useWorker: true,
+      });
+
+      myConfetti({
+        particleCount: 200,
+        spread: 160,
+      });
+    });
+  },
+};
+
 window.voiceflowExtensions = [
     VideoExtension,
     DisableInputExtension,
     FileUploadExtension,
-    FormExtension
+    FormExtension,
+    ConfettiExtension
 ];
