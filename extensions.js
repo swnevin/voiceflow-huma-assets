@@ -260,25 +260,7 @@ const FormExtension = {
     topicInput.value = trace.payload.topic || '';
     userQuestionInput.value = trace.payload.userQuestion || '';
 
-    // Disable all form inputs initially
-    const formElements = formContainer.querySelectorAll('input, textarea, button');
-    formElements.forEach(element => {
-      element.disabled = true;
-    });
-
-    // Optionally, disable an external textarea (e.g., chat input) when form is rendered
-    const externalTextarea = document.querySelector("#voiceflow-chat")?.shadowRoot?.querySelector('.vfrc-chat-input textarea');
-    if (externalTextarea) {
-      externalTextarea.placeholder = "Select one of the options above"; // Update placeholder if needed
-      externalTextarea.disabled = true; // Disable the external textarea
-    }
-
     formContainer.addEventListener('input', function () {
-      // Enable form inputs when the user starts typing
-      formElements.forEach(element => {
-        element.disabled = false;
-      });
-
       // Remove 'invalid' class when input becomes valid
       if (emailInput.checkValidity()) emailInput.classList.remove('invalid');
       if (topicInput.checkValidity()) topicInput.classList.remove('invalid');
@@ -288,43 +270,19 @@ const FormExtension = {
     formContainer.addEventListener('submit', function (event) {
       event.preventDefault();
 
-      // Validate inputs
-      let isValid = true;
-
-      if (!emailInput.checkValidity()) {
-        emailInput.classList.add('invalid');
-        isValid = false;
+      if (
+        !emailInput.checkValidity() ||
+        !topicInput.checkValidity() ||
+        !userQuestionInput.checkValidity()
+      ) {
+        if (!emailInput.checkValidity()) emailInput.classList.add('invalid');
+        if (!topicInput.checkValidity()) topicInput.classList.add('invalid');
+        if (!userQuestionInput.checkValidity()) userQuestionInput.classList.add('invalid');
+        return;
       }
 
-      if (!topicInput.checkValidity()) {
-        topicInput.classList.add('invalid');
-        isValid = false;
-      }
-
-      if (!userQuestionInput.checkValidity()) {
-        userQuestionInput.classList.add('invalid');
-        isValid = false;
-      }
-
-      if (!isValid) {
-        return; // Exit if the form is invalid
-      }
-
-      // Optionally, disable form inputs to prevent further editing after submission
-      formElements.forEach(element => {
-        element.disabled = true;
-      });
-
-      // Remove the submit button if desired
       formContainer.querySelector('.submit').remove();
 
-      // Re-enable the external textarea after successful submission
-      if (externalTextarea) {
-        externalTextarea.disabled = false;
-        externalTextarea.placeholder = "Type your message here..."; // Reset placeholder if needed
-      }
-
-      // Interact with Voiceflow or your backend
       window.voiceflow.chat.interact({
         type: 'complete',
         payload: {
@@ -338,6 +296,7 @@ const FormExtension = {
     element.appendChild(formContainer);
   },
 };
+
 
 window.voiceflowExtensions = [
     VideoExtension,
