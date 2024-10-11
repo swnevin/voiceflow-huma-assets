@@ -44,7 +44,7 @@
   .vfrc-chat--session-time,
   .vfrc-timestamp,
   .vfrc-footer--watermark {
-      color: rgba(250, 250, 249, 0.8); /* Font color with reduced opacity */
+      color: rgba(149, 54, 101, 0.8); /* Font color with reduced opacity */
   }
   .vfrc-assistant-info--description a,
   .vfrc-chat--session-time a,
