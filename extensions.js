@@ -132,7 +132,7 @@ const FileUploadExtension = {
     fileUploadContainer.innerHTML = `
       <style>
         .my-file-upload {
-          border: 2px dashed rgba(46, 110, 225, 0.3);
+          border: 2px dashed rgba(87, 24, 54, 0.3);
           padding: 20px;
           text-align: center;
           cursor: pointer;
