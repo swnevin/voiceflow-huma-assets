@@ -138,7 +138,7 @@ const FileUploadExtension = {
           cursor: pointer;
         }
       </style>
-      <div class='my-file-upload'>Drag and drop a file here or click to upload</div>
+      <div class='my-file-upload'>Cick to upload a file</div>
       <input type='file' style='display: none;'>
     `;
 
