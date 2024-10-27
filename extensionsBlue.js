@@ -198,8 +198,8 @@ const FileUploadExtension = {
   },
 };
 
-// Extension 4: FormExtension
-const FormExtension = {
+// Extension 4: FormExtension Norwegian
+const FormExtensionNo = {
   name: 'Forms',
   type: 'response',
   match: ({ trace }) =>
@@ -323,8 +323,8 @@ const FormExtension = {
   },
 };
 
-// Extension 4: FormExtension
-const FormExtensionNo = {
+// Extension 5: FormExtension English
+const FormExtension = {
   name: 'Forms',
   type: 'response',
   match: ({ trace }) =>
@@ -393,10 +393,10 @@ const FormExtensionNo = {
              pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
              title="Ugyldig e-post"><br><br>
 
-      <label for="topic">Topic</label>
-      <input type="text" class="topic" name="Tema" required><br><br>
+      <label for="topic">Tema</label>
+      <input type="text" class="topic" name="topic" required><br><br>
 
-      <label for="userQuestion">Question</label>
+      <label for="userQuestion">Melding</label>
       <textarea class="userQuestion" name="userQuestion" required></textarea><br><br>
 
       <input type="submit" class="submit" value="Send inn">
