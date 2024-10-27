@@ -209,46 +209,72 @@ const FormExtension = {
 
     formContainer.innerHTML = `
       <style>
-        label {
-          font-size: 0.8em;
-          color: #888;
-        }
-        input[type="text"], input[type="email"], textarea {
-          width: 100%;
-          border: none;
-          border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
-          background: transparent;
-          margin: 5px 0;
-          outline: none;
-          padding: 8px 0;
-          resize: vertical;
-        }
-        .invalid {
-          border-color: red;
-        }
-        .submit {
-          background: #632340;
-          border: none;
-          color: white;
-          padding: 10px;
-          border-radius: 5px;
-          width: 100%;
-          cursor: pointer;
-        }
+      @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
+      form {
+      font-family: 'Roboto', sans-serif;
+    max-width: 100%;
+    margin: auto;
+    padding: 0px;
+    background-color: transparent;
+    border-radius: 8px;
+  }
+
+  label {
+    font-size: 1em;
+    color: #333;
+    display: block;
+    margin: 10px 0 5px;
+    font-weight: 500;
+  }
+
+  input[type="text"], input[type="email"], textarea {
+    width: 100%;
+    border: 2px solid #003677; /* Tykkere kant med ny farge */
+    background-color: #fff;
+    color: #333;
+    margin: 10px 0;
+    padding: 10px;
+    outline: none;
+    font-size: 1em;
+    font-family: Arial, sans-serif; /* Bytter til Arial */
+    border-radius: 8px; /* Avrundede hjørner */
+    box-sizing: border-box;
+  }
+
+  textarea {
+    height: 100px;
+  }
+
+  .invalid {
+    border-color: red;
+  }
+
+  .submit {
+    background-color: #003677; /* Ny farge */
+    border: none;
+    color: white;
+    padding: 12px;
+    border-radius: 8px; /* Avrundede hjørner */
+    margin-top: 20px;
+    width: 100%;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 500;
+  }
       </style>
 
-      <label for="email">Email</label>
+      <label for="email">E-post</label>
       <input type="email" class="email" name="email" required
              pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
-             title="Invalid email address"><br><br>
+             title="Ugyldig e-post"><br><br>
 
       <label for="topic">Topic</label>
-      <input type="text" class="topic" name="topic" required><br><br>
+      <input type="text" class="topic" name="Tema" required><br><br>
 
       <label for="userQuestion">Question</label>
       <textarea class="userQuestion" name="userQuestion" required></textarea><br><br>
 
-      <input type="submit" class="submit" value="Submit">
+      <input type="submit" class="submit" value="Send inn">
     `;
 
     // Prefill the form fields with the variables from trace.payload
