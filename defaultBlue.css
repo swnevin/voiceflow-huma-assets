@@ -1,0 +1,142 @@
+:host {
+    --border-color-dark: #002677;
+    --text-color-secondary: #434242;
+    --background-color-light: #e6e6e6;
+    --background-color-medium: #002677;
+    --header-gradient-start: #002677;
+    --header-gradient-end: #01184a;
+    --button-border: #002677;
+    --button-fill: #f1f1f1;
+}
+
+.vfrc-widget--chat {
+  border-radius: 20px;
+}
+
+.vfrc-button--thumbs-up {
+    size: 50%;
+    background-color: #434242;
+}
+    
+.vfrc-button--secondary {
+    border-radius: 10px;
+    border: 1.6px solid var(--button-border);
+    font-weight: 200;
+    background-color: var(--button-fill);
+}
+
+.vfrc-button--primary[label="End Chat"] {
+    border-radius: 10px;
+    color: var(--text-color-secondary);
+    background-color: var(--button-border);
+    border: 1.6px solid var(--text-color-secondary);
+    font-family: 'Roboto', sans-serif;
+}
+
+.vfrc-button--primary[label="Cancel"] {
+    border-radius: 10px;
+    color: var(--text-color-secondary);
+    border: 1.6px solid var(--text-color-secondary);
+    background-color: var(--background-color-light);
+    font-family: 'Roboto', sans-serif;
+}
+
+.vfrc-prompt {
+    border: 1.6px solid var(--border-color-dark);
+}
+
+
+.vfrc-system-response .vfrc-message {
+    background-color: var(--background-color-light);
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    border-bottom-left-radius: 0px; 
+    border-bottom-right-radius: 15px;
+}
+
+.vfrc-user-response .vfrc-message {
+    background-color: var(--background-color-medium);
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 0px; 
+}
+
+.vfrc-footer {
+    border-radius: 0px;
+    border-top: solid 1.6px var(--border-color-dark);
+    background-color: var(--background-color-light);
+}
+.vfrc-header {
+    background: linear-gradient(to right, var(--header-gradient-start) 40%, var(--header-gradient-end));
+}
+
+.vfrc-chat--session-time,
+.vfrc-chat--status::placeholder {
+  background-image: none;
+}
+
+.vfrc-chat--session-time,
+.vfrc-chat--status::placeholder {
+  color: transparent;
+}
+
+.vfrc-chat--session-time,
+.vfrc-chat--status {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='50px' width='250px'><text x='60' y='30' fill='gray' font-family='Arial' font-size='13'>I dag</text></svg>");
+  background-repeat: no-repeat;
+  background-position: left;
+}
+
+.vfrc-chat-input textarea {
+  background-image: none;
+}
+.vfrc-chat-input textarea::-moz-placeholder {
+  color: transparent;
+}
+.vfrc-chat-input textarea::placeholder {
+  color: transparent;
+}
+
+.vfrc-prompt button.vfrc-button--primary,
+footer button.vfrc-button--primary {
+  position: relative;
+  color: transparent !important;
+}
+.vfrc-prompt button.vfrc-button--primary::after,
+footer button.vfrc-button--primary::after {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  inset: 0;
+  color: #ffffff;
+}
+.vfrc-prompt button.vfrc-button--primary[label=Cancel]::after,
+footer button.vfrc-button--primary[label=Cancel]::after {
+  color: rgba(0, 0, 0, 0.9);
+}
+
+.vfrc-chat-input textarea:-moz-placeholder-shown {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='50px' width='250px'><text x='15' y='25' fill='silver' font-family='roboto' font-size='15'>Melding...</text></svg>");
+  background-repeat: no-repeat;
+}
+
+.vfrc-chat-input textarea:placeholder-shown {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='50px' width='250px'><text x='15' y='25' fill='silver' font-family='roboto' font-size='15'>Melding...</text></svg>");
+  background-repeat: no-repeat;
+}
+
+.vfrc-prompt button.vfrc-button--primary::after,
+footer button.vfrc-button--primary::after {
+  content: "Start ny samtale";
+}
+.vfrc-prompt button.vfrc-button--primary[label="End Chat"]::after,
+footer button.vfrc-button--primary[label="End Chat"]::after {
+  content: "Avslutt samtale";
+}
+.vfrc-prompt button.vfrc-button--primary[label=Cancel]::after,
+footer button.vfrc-button--primary[label=Cancel]::after {
+  content: "Avbryt";
+  color: rgba(0, 0, 0, 0.9);
+}
