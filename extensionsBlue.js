@@ -203,7 +203,7 @@ const FormExtensionNo = {
   name: 'Forms',
   type: 'response',
   match: ({ trace }) =>
-    trace.type === 'Custom_Form' || trace.payload.name === 'Custom_Form',
+    trace.type === 'Custom_Form_No' || trace.payload.name === 'Custom_Form_No',
   render: ({ trace, element }) => {
     const formContainer = document.createElement('form');
 
