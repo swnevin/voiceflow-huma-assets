@@ -205,105 +205,7 @@ const FormExtension = {
   match: ({ trace }) =>
     trace.type === 'Custom_Form' || trace.payload.name === 'Custom_Form',
   render: ({ trace, element }) => {
-    const formContainer = document.createElement('form');
-
-    formContainer.innerHTML = `
-      <style>
-        label {
-          font-size: 0.8em;
-          color: #888;
-        }
-        input[type="text"], input[type="email"], textarea {
-          width: 100%;
-          border: none;
-          border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
-          background: transparent;
-          margin: 5px 0;
-          outline: none;
-          padding: 8px 0;
-          resize: vertical;
-        }
-        .invalid {
-          border-color: red;
-        }
-        .submit {
-          background: #632340;
-          border: none;
-          color: white;
-          padding: 10px;
-          border-radius: 5px;
-          width: 100%;
-          cursor: pointer;
-        }
-      </style>
-
-      <label for="email">Email</label>
-      <input type="email" class="email" name="email" required
-             pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
-             title="Invalid email address"><br><br>
-
-      <label for="topic">Topic</label>
-      <input type="text" class="topic" name="topic" required><br><br>
-
-      <label for="userQuestion">Question</label>
-      <textarea class="userQuestion" name="userQuestion" required></textarea><br><br>
-
-      <input type="submit" class="submit" value="Submit">
-    `;
-
-    // Prefill the form fields with the variables from trace.payload
-    const emailInput = formContainer.querySelector('.email');
-    const topicInput = formContainer.querySelector('.topic');
-    const userQuestionInput = formContainer.querySelector('.userQuestion');
-
-    emailInput.value = trace.payload.email || '';
-    topicInput.value = trace.payload.topic || '';
-    userQuestionInput.value = trace.payload.userQuestion || '';
-
-    formContainer.addEventListener('input', function () {
-      // Remove 'invalid' class when input becomes valid
-      if (emailInput.checkValidity()) emailInput.classList.remove('invalid');
-      if (topicInput.checkValidity()) topicInput.classList.remove('invalid');
-      if (userQuestionInput.checkValidity()) userQuestionInput.classList.remove('invalid');
-    });
-
-    formContainer.addEventListener('submit', function (event) {
-      event.preventDefault();
-
-      if (
-        !emailInput.checkValidity() ||
-        !topicInput.checkValidity() ||
-        !userQuestionInput.checkValidity()
-      ) {
-        if (!emailInput.checkValidity()) emailInput.classList.add('invalid');
-        if (!topicInput.checkValidity()) topicInput.classList.add('invalid');
-        if (!userQuestionInput.checkValidity()) userQuestionInput.classList.add('invalid');
-        return;
-      }
-
-      formContainer.querySelector('.submit').remove();
-
-      window.voiceflow.chat.interact({
-        type: 'complete',
-        payload: {
-          email: emailInput.value,
-          topic: topicInput.value,
-          userQuestion: userQuestionInput.value,
-        },
-      });
-    });
-
-    element.appendChild(formContainer);
-  },
-};
-
-const FormWithFileUploadExtension = {
-  name: 'FormWithFileUpload',
-  type: 'response',
-  match: ({ trace }) =>
-    trace.type === 'Custom_FormWithFileUpload' || trace.payload.name === 'Custom_FormWithFileUpload',
-  render: ({ trace, element }) => {
-    // Create the form element
+// Create the form element
     const formContainer = document.createElement('form');
 
     // Build the form HTML, including the file upload UI
@@ -485,12 +387,9 @@ const FormWithFileUploadExtension = {
 };
 
 
-
-
 window.voiceflowExtensions = [
     VideoExtension,
     DisableInputExtension,
     FileUploadExtension,
-    FormExtension,
-    FormWithFileUploadExtension
+    FormExtension
 ];
