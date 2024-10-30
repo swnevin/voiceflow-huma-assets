@@ -249,7 +249,7 @@ const FormExtension = {
         }
       </style>
 
-      <label for="email">Email</label>
+      <label for="email">E-mail</label>
       <input type="email" class="email" name="email" required
              pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
              title="Invalid email address"><br><br>
