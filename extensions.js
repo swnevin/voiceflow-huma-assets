@@ -296,7 +296,7 @@ const FormExtension = {
     element.appendChild(formContainer);
   },
 };
-// form extension with fileupload
+
 const FormWithFileUploadExtension = {
   name: 'FormWithFileUpload',
   type: 'response',
@@ -359,7 +359,7 @@ const FormWithFileUploadExtension = {
       <label for="userQuestion">Question</label>
       <textarea class="userQuestion" name="userQuestion" required></textarea><br><br>
 
-      <div class='my-file-upload'>Click to upload a file</div>
+      <div class='my-file-upload'>Click here to upload any relevant screenshots</div>
       <input type='file' class='file-input' style='display: none;'>
 
       <div class="upload-status"></div>
@@ -397,7 +397,7 @@ const FormWithFileUploadExtension = {
         // Show file name in the UI
         fileUploadBox.textContent = 'File selected: ' + selectedFile.name;
       } else {
-        fileUploadBox.textContent = 'Click to upload a file';
+        fileUploadBox.textContent = 'Click here to upload any relevant screenshots';
       }
     });
 
@@ -424,8 +424,9 @@ const FormWithFileUploadExtension = {
         return;
       }
 
-      // Disable submit button to prevent multiple submissions
+      // Disable submit button to prevent multiple submissions and remove it after submit
       submitButton.disabled = true;
+      submitButton.style.display = 'none';
 
       // Function to send form data to Voiceflow
       const submitFormData = (fileUrl) => {
@@ -462,10 +463,7 @@ const FormWithFileUploadExtension = {
             }
           })
           .then((result) => {
-            uploadStatusDiv.innerHTML = `
-              <img src="https://s3.amazonaws.com/com.voiceflow.studio/share/check/check.gif"
-                   alt="Uploaded" width="50" height="50">
-            `;
+            uploadStatusDiv.innerHTML = ''; // Clear the upload status after submission
             fileUrl = result.data.url.replace('https://tmpfiles.org/', 'https://tmpfiles.org/dl/');
             // Submit the form data with file URL
             submitFormData(fileUrl);
@@ -485,6 +483,7 @@ const FormWithFileUploadExtension = {
     element.appendChild(formContainer);
   },
 };
+
 
 
 
