@@ -296,11 +296,202 @@ const FormExtension = {
     element.appendChild(formContainer);
   },
 };
+// form extension with fileupload
+const FormWithFileUploadExtension = {
+  name: 'FormWithFileUpload',
+  type: 'response',
+  match: ({ trace }) =>
+    trace.type === 'Custom_FormWithFileUpload' || trace.payload.name === 'Custom_FormWithFileUpload',
+  render: ({ trace, element }) => {
+    // Create the form element
+    const formContainer = document.createElement('form');
+
+    // Build the form HTML, including the file upload UI
+    formContainer.innerHTML = `
+      <style>
+        label {
+          font-size: 0.8em;
+          color: #888;
+        }
+        input[type="text"], input[type="email"], textarea {
+          width: 100%;
+          border: none;
+          border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
+          background: transparent;
+          margin: 5px 0;
+          outline: none;
+          padding: 8px 0;
+          resize: vertical;
+        }
+        .invalid {
+          border-color: red;
+        }
+        .submit {
+          background: #632340;
+          border: none;
+          color: white;
+          padding: 10px;
+          border-radius: 5px;
+          width: 100%;
+          cursor: pointer;
+        }
+        .my-file-upload {
+          border: 2px dashed rgba(87, 24, 54, 0.3);
+          padding: 20px;
+          text-align: center;
+          cursor: pointer;
+          margin-bottom: 10px;
+        }
+        .upload-status {
+          text-align: center;
+          margin-bottom: 10px;
+        }
+      </style>
+
+      <label for="email">Email</label>
+      <input type="email" class="email" name="email" required
+             pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+             title="Invalid email address"><br><br>
+
+      <label for="topic">Topic</label>
+      <input type="text" class="topic" name="topic" required><br><br>
+
+      <label for="userQuestion">Question</label>
+      <textarea class="userQuestion" name="userQuestion" required></textarea><br><br>
+
+      <div class='my-file-upload'>Click to upload a file</div>
+      <input type='file' class='file-input' style='display: none;'>
+
+      <div class="upload-status"></div>
+
+      <input type="submit" class="submit" value="Submit">
+    `;
+
+    // Get references to the inputs
+    const emailInput = formContainer.querySelector('.email');
+    const topicInput = formContainer.querySelector('.topic');
+    const userQuestionInput = formContainer.querySelector('.userQuestion');
+    const fileInput = formContainer.querySelector('.file-input');
+    const fileUploadBox = formContainer.querySelector('.my-file-upload');
+    const uploadStatusDiv = formContainer.querySelector('.upload-status');
+    const submitButton = formContainer.querySelector('.submit');
+
+    // Prefill the form fields with the variables from trace.payload
+    emailInput.value = trace.payload.email || '';
+    topicInput.value = trace.payload.topic || '';
+    userQuestionInput.value = trace.payload.userQuestion || '';
+
+    // Variable to store the selected file
+    let selectedFile = null;
+    let fileUrl = null;
+
+    // File upload click handler
+    fileUploadBox.addEventListener('click', function () {
+      fileInput.click();
+    });
+
+    // File input change handler
+    fileInput.addEventListener('change', function () {
+      selectedFile = fileInput.files[0];
+      if (selectedFile) {
+        // Show file name in the UI
+        fileUploadBox.textContent = 'File selected: ' + selectedFile.name;
+      } else {
+        fileUploadBox.textContent = 'Click to upload a file';
+      }
+    });
+
+    // Form input validation
+    formContainer.addEventListener('input', function () {
+      // Remove 'invalid' class when input becomes valid
+      if (emailInput.checkValidity()) emailInput.classList.remove('invalid');
+      if (topicInput.checkValidity()) topicInput.classList.remove('invalid');
+      if (userQuestionInput.checkValidity()) userQuestionInput.classList.remove('invalid');
+    });
+
+    // Form submit handler
+    formContainer.addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      if (
+        !emailInput.checkValidity() ||
+        !topicInput.checkValidity() ||
+        !userQuestionInput.checkValidity()
+      ) {
+        if (!emailInput.checkValidity()) emailInput.classList.add('invalid');
+        if (!topicInput.checkValidity()) topicInput.classList.add('invalid');
+        if (!userQuestionInput.checkValidity()) userQuestionInput.classList.add('invalid');
+        return;
+      }
+
+      // Disable submit button to prevent multiple submissions
+      submitButton.disabled = true;
+
+      // Function to send form data to Voiceflow
+      const submitFormData = (fileUrl) => {
+        window.voiceflow.chat.interact({
+          type: 'complete',
+          payload: {
+            email: emailInput.value,
+            topic: topicInput.value,
+            userQuestion: userQuestionInput.value,
+            file: fileUrl || null,
+          },
+        });
+      };
+
+      // If a file is selected, upload it first
+      if (selectedFile) {
+        uploadStatusDiv.innerHTML = `
+          <img src="https://s3.amazonaws.com/com.voiceflow.studio/share/upload/upload.gif"
+               alt="Uploading" width="50" height="50">
+        `;
+
+        var data = new FormData();
+        data.append('file', selectedFile);
+
+        fetch('https://tmpfiles.org/api/v1/upload', {
+          method: 'POST',
+          body: data,
+        })
+          .then((response) => {
+            if (response.ok) {
+              return response.json();
+            } else {
+              throw new Error('Upload failed: ' + response.statusText);
+            }
+          })
+          .then((result) => {
+            uploadStatusDiv.innerHTML = `
+              <img src="https://s3.amazonaws.com/com.voiceflow.studio/share/check/check.gif"
+                   alt="Uploaded" width="50" height="50">
+            `;
+            fileUrl = result.data.url.replace('https://tmpfiles.org/', 'https://tmpfiles.org/dl/');
+            // Submit the form data with file URL
+            submitFormData(fileUrl);
+          })
+          .catch((error) => {
+            console.error(error);
+            uploadStatusDiv.innerHTML = '<div>Error during file upload</div>';
+            // Submit the form data without file URL
+            submitFormData(null);
+          });
+      } else {
+        // No file selected, submit the form data directly
+        submitFormData(null);
+      }
+    });
+
+    element.appendChild(formContainer);
+  },
+};
+
 
 
 window.voiceflowExtensions = [
     VideoExtension,
     DisableInputExtension,
     FileUploadExtension,
-    FormExtension
+    FormExtension,
+    FormWithFileUploadExtension
 ];
