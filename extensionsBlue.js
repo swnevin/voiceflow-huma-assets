@@ -198,219 +198,114 @@ const FileUploadExtension = {
   },
 };
 
-// Extension 4: FormExtension Norwegian
-const FormExtensionNo = {
-  name: 'Forms',
-  type: 'response',
-  match: ({ trace }) =>
-    trace.type === 'Custom_Form_No' || trace.payload.name === 'Custom_Form_No',
-  render: ({ trace, element }) => {
-    const formContainer = document.createElement('form');
-
-    formContainer.innerHTML = `
-      <style>
-      @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
-      form {
-      font-family: 'Roboto', sans-serif;
-    max-width: 100%;
-    margin: auto;
-    padding: 0px;
-    background-color: transparent;
-    border-radius: 8px;
-  }
-
-  label {
-    font-size: 1em;
-    color: #333;
-    display: block;
-    margin: 10px 0 5px;
-    font-weight: 500;
-  }
-
-  input[type="text"], input[type="email"], textarea {
-    width: 100%;
-    border: 2px solid #003677; /* Tykkere kant med ny farge */
-    background-color: #fff;
-    color: #333;
-    margin: 10px 0;
-    padding: 10px;
-    outline: none;
-    font-size: 1em;
-    font-family: Arial, sans-serif; /* Bytter til Arial */
-    border-radius: 8px; /* Avrundede hjørner */
-    box-sizing: border-box;
-  }
-
-  textarea {
-    height: 100px;
-  }
-
-  .invalid {
-    border-color: red;
-  }
-
-  .submit {
-    background-color: #003677; /* Ny farge */
-    border: none;
-    color: white;
-    padding: 12px;
-    border-radius: 8px; /* Avrundede hjørner */
-    margin-top: 20px;
-    width: 100%;
-    cursor: pointer;
-    font-size: 1em;
-    font-weight: 500;
-  }
-      </style>
-
-      <label for="email">E-post</label>
-      <input type="email" class="email" name="email" required
-             pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
-             title="Ugyldig e-post"><br><br>
-
-      <label for="topic">Topic</label>
-      <input type="text" class="topic" name="Tema" required><br><br>
-
-      <label for="userQuestion">Question</label>
-      <textarea class="userQuestion" name="userQuestion" required></textarea><br><br>
-
-      <input type="submit" class="submit" value="Send inn">
-    `;
-
-    // Prefill the form fields with the variables from trace.payload
-    const emailInput = formContainer.querySelector('.email');
-    const topicInput = formContainer.querySelector('.topic');
-    const userQuestionInput = formContainer.querySelector('.userQuestion');
-
-    emailInput.value = trace.payload.email || '';
-    topicInput.value = trace.payload.topic || '';
-    userQuestionInput.value = trace.payload.userQuestion || '';
-
-    formContainer.addEventListener('input', function () {
-      // Remove 'invalid' class when input becomes valid
-      if (emailInput.checkValidity()) emailInput.classList.remove('invalid');
-      if (topicInput.checkValidity()) topicInput.classList.remove('invalid');
-      if (userQuestionInput.checkValidity()) userQuestionInput.classList.remove('invalid');
-    });
-
-    formContainer.addEventListener('submit', function (event) {
-      event.preventDefault();
-
-      if (
-        !emailInput.checkValidity() ||
-        !topicInput.checkValidity() ||
-        !userQuestionInput.checkValidity()
-      ) {
-        if (!emailInput.checkValidity()) emailInput.classList.add('invalid');
-        if (!topicInput.checkValidity()) topicInput.classList.add('invalid');
-        if (!userQuestionInput.checkValidity()) userQuestionInput.classList.add('invalid');
-        return;
-      }
-
-      formContainer.querySelector('.submit').remove();
-
-      window.voiceflow.chat.interact({
-        type: 'complete',
-        payload: {
-          email: emailInput.value,
-          topic: topicInput.value,
-          userQuestion: userQuestionInput.value,
-        },
-      });
-    });
-
-    element.appendChild(formContainer);
-  },
-};
-
-// Extension 5: FormExtension English
 const FormExtension = {
   name: 'Forms',
   type: 'response',
   match: ({ trace }) =>
     trace.type === 'Custom_Form' || trace.payload.name === 'Custom_Form',
   render: ({ trace, element }) => {
+    // Create the form element
     const formContainer = document.createElement('form');
 
+    // Build the form HTML, including the file upload UI
     formContainer.innerHTML = `
       <style>
-      @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
-      form {
-      font-family: 'Roboto', sans-serif;
-    max-width: 100%;
-    margin: auto;
-    padding: 0px;
-    background-color: transparent;
-    border-radius: 8px;
-  }
-
-  label {
-    font-size: 1em;
-    color: #333;
-    display: block;
-    margin: 10px 0 5px;
-    font-weight: 500;
-  }
-
-  input[type="text"], input[type="email"], textarea {
-    width: 100%;
-    border: 2px solid #003677; /* Tykkere kant med ny farge */
-    background-color: #fff;
-    color: #333;
-    margin: 10px 0;
-    padding: 10px;
-    outline: none;
-    font-size: 1em;
-    font-family: Arial, sans-serif; /* Bytter til Arial */
-    border-radius: 8px; /* Avrundede hjørner */
-    box-sizing: border-box;
-  }
-
-  textarea {
-    height: 100px;
-  }
-
-  .invalid {
-    border-color: red;
-  }
-
-  .submit {
-    background-color: #003677; /* Ny farge */
-    border: none;
-    color: white;
-    padding: 12px;
-    border-radius: 8px; /* Avrundede hjørner */
-    margin-top: 20px;
-    width: 100%;
-    cursor: pointer;
-    font-size: 1em;
-    font-weight: 500;
-  }
+        label {
+          font-size: 0.8em;
+          color: #888;
+        }
+        input[type="text"], input[type="email"], textarea {
+          width: 100%;
+          border: none;
+          border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
+          background: transparent;
+          margin: 5px 0;
+          outline: none;
+          padding: 8px 0;
+          resize: vertical;
+        }
+        .invalid {
+          border-color: red;
+        }
+        .submit {
+          background: #632340;
+          border: none;
+          color: white;
+          padding: 10px;
+          border-radius: 5px;
+          width: 100%;
+          cursor: pointer;
+        }
+        .my-file-upload {
+          border: 2px dashed rgba(87, 24, 54, 0.3);
+          padding: 20px;
+          text-align: center;
+          cursor: pointer;
+          margin-bottom: 10px;
+        }
+        .upload-status {
+          text-align: center;
+          margin-bottom: 10px;
+        }
       </style>
 
-      <label for="email">E-post</label>
+      <label for="email">Email</label>
       <input type="email" class="email" name="email" required
              pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
-             title="Ugyldig e-post"><br><br>
+             title="Invalid email address"><br><br>
 
-      <label for="topic">Tema</label>
+      <label for="topic">Topic</label>
       <input type="text" class="topic" name="topic" required><br><br>
 
-      <label for="userQuestion">Melding</label>
+      <label for="userQuestion">Question</label>
       <textarea class="userQuestion" name="userQuestion" required></textarea><br><br>
 
-      <input type="submit" class="submit" value="Send inn">
+      <div class='my-file-upload'>Click here to upload any relevant screenshots</div>
+      <input type='file' class='file-input' style='display: none;'>
+
+      <div class="upload-status"></div>
+
+      <input type="submit" class="submit" value="Submit">
     `;
 
-    // Prefill the form fields with the variables from trace.payload
+    // Get references to the inputs
     const emailInput = formContainer.querySelector('.email');
     const topicInput = formContainer.querySelector('.topic');
     const userQuestionInput = formContainer.querySelector('.userQuestion');
+    const fileInput = formContainer.querySelector('.file-input');
+    const fileUploadBox = formContainer.querySelector('.my-file-upload');
+    const uploadStatusDiv = formContainer.querySelector('.upload-status');
+    const submitButton = formContainer.querySelector('.submit');
 
+    // Prefill the form fields with the variables from trace.payload
     emailInput.value = trace.payload.email || '';
     topicInput.value = trace.payload.topic || '';
     userQuestionInput.value = trace.payload.userQuestion || '';
 
+    // Variable to store the selected file
+    let selectedFile = null;
+    let fileUrl = null;
+
+    // Variable to store original value descriptor
+    let originalValueDescriptor = null;
+
+    // File upload click handler
+    fileUploadBox.addEventListener('click', function () {
+      fileInput.click();
+    });
+
+    // File input change handler
+    fileInput.addEventListener('change', function () {
+      selectedFile = fileInput.files[0];
+      if (selectedFile) {
+        // Show file name in the UI
+        fileUploadBox.textContent = 'File selected: ' + selectedFile.name;
+      } else {
+        fileUploadBox.textContent = 'Click here to upload any relevant screenshots';
+      }
+    });
+
+    // Form input validation
     formContainer.addEventListener('input', function () {
       // Remove 'invalid' class when input becomes valid
       if (emailInput.checkValidity()) emailInput.classList.remove('invalid');
@@ -418,6 +313,98 @@ const FormExtension = {
       if (userQuestionInput.checkValidity()) userQuestionInput.classList.remove('invalid');
     });
 
+    // Function to disable or enable the chat input
+    function disableInput(isDisabled) {
+      const chatDiv = document.getElementById('voiceflow-chat');
+
+      if (chatDiv) {
+        const shadowRoot = chatDiv.shadowRoot;
+        if (shadowRoot) {
+          const chatInput = shadowRoot.querySelector('.vfrc-chat-input');
+          const textarea = shadowRoot.querySelector(
+            'textarea[id^="vf-chat-input--"]'
+          );
+          const button = shadowRoot.querySelector('.vfrc-chat-input--button');
+
+          if (chatInput && textarea && button) {
+            // Add a style tag if it doesn't exist
+            let styleTag = shadowRoot.querySelector('#vf-disable-input-style');
+            if (!styleTag) {
+              styleTag = document.createElement('style');
+              styleTag.id = 'vf-disable-input-style';
+              styleTag.textContent = `
+                .vf-no-border, .vf-no-border * {
+                  border: none !important;
+                }
+                .vf-hide-button {
+                  display: none !important;
+                }
+              `;
+              shadowRoot.appendChild(styleTag);
+            }
+
+            if (originalValueDescriptor === null) {
+              // Store original value descriptor only once
+              originalValueDescriptor = Object.getOwnPropertyDescriptor(
+                Object.getPrototypeOf(textarea),
+                'value'
+              );
+            }
+
+            function updateInputState() {
+              textarea.disabled = isDisabled;
+              if (!isDisabled) {
+                textarea.placeholder = 'Message...';
+                chatInput.classList.remove('vf-no-border');
+                button.classList.remove('vf-hide-button');
+                // Restore original value getter/setter
+                if (originalValueDescriptor) {
+                  Object.defineProperty(
+                    textarea,
+                    'value',
+                    originalValueDescriptor
+                  );
+                }
+              } else {
+                textarea.placeholder = '';
+                chatInput.classList.add('vf-no-border');
+                button.classList.add('vf-hide-button');
+                if (originalValueDescriptor) {
+                  Object.defineProperty(textarea, 'value', {
+                    get: function () {
+                      return '';
+                    },
+                    configurable: true,
+                  });
+                }
+              }
+
+              // Trigger events to update component state
+              textarea.dispatchEvent(
+                new Event('input', { bubbles: true, cancelable: true })
+              );
+              textarea.dispatchEvent(
+                new Event('change', { bubbles: true, cancelable: true })
+              );
+            }
+
+            // Update input state
+            updateInputState();
+          } else {
+            console.error('Chat input, textarea, or button not found');
+          }
+        } else {
+          console.error('Shadow root not found');
+        }
+      } else {
+        console.error('Chat div not found');
+      }
+    }
+
+    // Disable the chat input when the form is rendered
+    disableInput(true);
+
+    // Form submit handler
     formContainer.addEventListener('submit', function (event) {
       event.preventDefault();
 
@@ -432,18 +419,74 @@ const FormExtension = {
         return;
       }
 
-      formContainer.querySelector('.submit').remove();
+      // Disable submit button to prevent multiple submissions and remove it after submit
+      submitButton.disabled = true;
+      submitButton.style.display = 'none';
 
-      window.voiceflow.chat.interact({
-        type: 'complete',
-        payload: {
-          email: emailInput.value,
-          topic: topicInput.value,
-          userQuestion: userQuestionInput.value,
-        },
-      });
+      // Function to send form data to Voiceflow
+      const submitFormData = (fileUrl) => {
+        window.voiceflow.chat.interact({
+          type: 'complete',
+          payload: {
+            email: emailInput.value,
+            topic: topicInput.value,
+            userQuestion: userQuestionInput.value,
+            file: fileUrl || null,
+          },
+        });
+
+        // Re-enable the chat input after submission
+        disableInput(false);
+      };
+
+      // If a file is selected, upload it first
+      if (selectedFile) {
+        uploadStatusDiv.innerHTML = `
+          <img src="https://s3.amazonaws.com/com.voiceflow.studio/share/upload/upload.gif"
+               alt="Uploading" width="50" height="50">
+        `;
+
+        var data = new FormData();
+        data.append('file', selectedFile);
+
+        fetch('https://tmpfiles.org/api/v1/upload', {
+          method: 'POST',
+          body: data,
+        })
+          .then((response) => {
+            if (response.ok) {
+              return response.json();
+            } else {
+              throw new Error('Upload failed: ' + response.statusText);
+            }
+          })
+          .then((result) => {
+            uploadStatusDiv.innerHTML = ''; // Clear the upload status after submission
+            fileUrl = result.data.url.replace('https://tmpfiles.org/', 'https://tmpfiles.org/dl/');
+            // Submit the form data with file URL
+            submitFormData(fileUrl);
+          })
+          .catch((error) => {
+            console.error(error);
+            uploadStatusDiv.innerHTML = '<div>Error during file upload</div>';
+            // Submit the form data without file URL
+            submitFormData(null);
+          });
+      } else {
+        // No file selected, submit the form data directly
+        submitFormData(null);
+      }
     });
 
     element.appendChild(formContainer);
   },
 };
+
+
+
+window.voiceflowExtensions = [
+    VideoExtension,
+    DisableInputExtension,
+    FileUploadExtension,
+    FormExtension
+];
