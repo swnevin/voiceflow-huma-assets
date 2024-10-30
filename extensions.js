@@ -198,14 +198,13 @@ const FileUploadExtension = {
   },
 };
 
-// Extension 4: FormExtension
 const FormExtension = {
   name: 'Forms',
   type: 'response',
   match: ({ trace }) =>
     trace.type === 'Custom_Form' || trace.payload.name === 'Custom_Form',
   render: ({ trace, element }) => {
-// Create the form element
+    // Create the form element
     const formContainer = document.createElement('form');
 
     // Build the form HTML, including the file upload UI
@@ -287,6 +286,9 @@ const FormExtension = {
     let selectedFile = null;
     let fileUrl = null;
 
+    // Variable to store original value descriptor
+    let originalValueDescriptor = null;
+
     // File upload click handler
     fileUploadBox.addEventListener('click', function () {
       fileInput.click();
@@ -310,6 +312,97 @@ const FormExtension = {
       if (topicInput.checkValidity()) topicInput.classList.remove('invalid');
       if (userQuestionInput.checkValidity()) userQuestionInput.classList.remove('invalid');
     });
+
+    // Function to disable or enable the chat input
+    function disableInput(isDisabled) {
+      const chatDiv = document.getElementById('voiceflow-chat');
+
+      if (chatDiv) {
+        const shadowRoot = chatDiv.shadowRoot;
+        if (shadowRoot) {
+          const chatInput = shadowRoot.querySelector('.vfrc-chat-input');
+          const textarea = shadowRoot.querySelector(
+            'textarea[id^="vf-chat-input--"]'
+          );
+          const button = shadowRoot.querySelector('.vfrc-chat-input--button');
+
+          if (chatInput && textarea && button) {
+            // Add a style tag if it doesn't exist
+            let styleTag = shadowRoot.querySelector('#vf-disable-input-style');
+            if (!styleTag) {
+              styleTag = document.createElement('style');
+              styleTag.id = 'vf-disable-input-style';
+              styleTag.textContent = `
+                .vf-no-border, .vf-no-border * {
+                  border: none !important;
+                }
+                .vf-hide-button {
+                  display: none !important;
+                }
+              `;
+              shadowRoot.appendChild(styleTag);
+            }
+
+            if (originalValueDescriptor === null) {
+              // Store original value descriptor only once
+              originalValueDescriptor = Object.getOwnPropertyDescriptor(
+                Object.getPrototypeOf(textarea),
+                'value'
+              );
+            }
+
+            function updateInputState() {
+              textarea.disabled = isDisabled;
+              if (!isDisabled) {
+                textarea.placeholder = 'Message...';
+                chatInput.classList.remove('vf-no-border');
+                button.classList.remove('vf-hide-button');
+                // Restore original value getter/setter
+                if (originalValueDescriptor) {
+                  Object.defineProperty(
+                    textarea,
+                    'value',
+                    originalValueDescriptor
+                  );
+                }
+              } else {
+                textarea.placeholder = '';
+                chatInput.classList.add('vf-no-border');
+                button.classList.add('vf-hide-button');
+                if (originalValueDescriptor) {
+                  Object.defineProperty(textarea, 'value', {
+                    get: function () {
+                      return '';
+                    },
+                    configurable: true,
+                  });
+                }
+              }
+
+              // Trigger events to update component state
+              textarea.dispatchEvent(
+                new Event('input', { bubbles: true, cancelable: true })
+              );
+              textarea.dispatchEvent(
+                new Event('change', { bubbles: true, cancelable: true })
+              );
+            }
+
+            // Update input state
+            updateInputState();
+          } else {
+            console.error('Chat input, textarea, or button not found');
+          }
+        } else {
+          console.error('Shadow root not found');
+        }
+      } else {
+        console.error('Chat div not found');
+      }
+    }
+
+    // Disable the chat input when the form is rendered
+    disableInput(true);
 
     // Form submit handler
     formContainer.addEventListener('submit', function (event) {
@@ -341,6 +434,9 @@ const FormExtension = {
             file: fileUrl || null,
           },
         });
+
+        // Re-enable the chat input after submission
+        disableInput(false);
       };
 
       // If a file is selected, upload it first
@@ -385,6 +481,7 @@ const FormExtension = {
     element.appendChild(formContainer);
   },
 };
+
 
 
 window.voiceflowExtensions = [
