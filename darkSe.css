@@ -160,7 +160,7 @@ footer button.vfrc-button--primary[label="End Chat"]::after {
 .vfrc-prompt button.vfrc-button--primary[label=Cancel]::after,
 footer button.vfrc-button--primary[label=Cancel]::after {
   content: "Avbryt";
-  color: rgba(0, 0, 0, 0.9);
+  color: rgba(255, 255, 255, 1);
 }
 
 .vfrc-proactive-message {
