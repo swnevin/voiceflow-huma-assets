@@ -1,492 +1,144 @@
-// Extension 1: VideoExtension
-const VideoExtension = {
-  name: 'Video',
-  type: 'response',
-  match: ({ trace }) =>
-    trace.type === 'ext_video' || trace.payload.name === 'ext_video',
-  render: ({ trace, element }) => {
-    const videoElement = document.createElement('video');
-    const { videoURL, autoplay, controls } = trace.payload;
-
-    videoElement.width = 240;
-    videoElement.src = videoURL;
-
-    if (autoplay) {
-      videoElement.setAttribute('autoplay', '');
-    }
-    if (controls) {
-      videoElement.setAttribute('controls', '');
-    }
-
-    videoElement.addEventListener('ended', function () {
-      window.voiceflow.chat.interact({ type: 'complete' });
-    });
-
-    element.appendChild(videoElement);
-  },
-};
-
-// Extension 2: DisableInputExtension
-const DisableInputExtension = {
-  name: 'DisableInput',
-  type: 'effect',
-  match: ({ trace }) =>
-    trace.type === 'ext_disableInput' ||
-    trace.payload.name === 'ext_disableInput',
-  effect: ({ trace }) => {
-    const { isDisabled } = trace.payload;
-
-    function disableInput() {
-      const chatDiv = document.getElementById('voiceflow-chat');
-
-      if (chatDiv) {
-        const shadowRoot = chatDiv.shadowRoot;
-        if (shadowRoot) {
-          const chatInput = shadowRoot.querySelector('.vfrc-chat-input');
-          const textarea = shadowRoot.querySelector(
-            'textarea[id^="vf-chat-input--"]'
-          );
-          const button = shadowRoot.querySelector('.vfrc-chat-input--button');
-
-          if (chatInput && textarea && button) {
-            // Add a style tag if it doesn't exist
-            let styleTag = shadowRoot.querySelector('#vf-disable-input-style');
-            if (!styleTag) {
-              styleTag = document.createElement('style');
-              styleTag.id = 'vf-disable-input-style';
-              styleTag.textContent = `
-                .vf-no-border, .vf-no-border * {
-                  border: none !important;
-                }
-                .vf-hide-button {
-                  display: none !important;
-                }
-              `;
-              shadowRoot.appendChild(styleTag);
-            }
-
-            function updateInputState() {
-              textarea.disabled = isDisabled;
-              if (!isDisabled) {
-                textarea.placeholder = 'Message...';
-                chatInput.classList.remove('vf-no-border');
-                button.classList.remove('vf-hide-button');
-                // Restore original value getter/setter
-                Object.defineProperty(
-                  textarea,
-                  'value',
-                  originalValueDescriptor
-                );
-              } else {
-                textarea.placeholder = '';
-                chatInput.classList.add('vf-no-border');
-                button.classList.add('vf-hide-button');
-                Object.defineProperty(textarea, 'value', {
-                  get: function () {
-                    return '';
-                  },
-                  configurable: true,
-                });
-              }
-
-              // Trigger events to update component state
-              textarea.dispatchEvent(
-                new Event('input', { bubbles: true, cancelable: true })
-              );
-              textarea.dispatchEvent(
-                new Event('change', { bubbles: true, cancelable: true })
-              );
-            }
-
-            // Store original value descriptor
-            const originalValueDescriptor = Object.getOwnPropertyDescriptor(
-              HTMLTextAreaElement.prototype,
-              'value'
-            );
-
-            // Initial update
-            updateInputState();
-          } else {
-            console.error('Chat input, textarea, or button not found');
-          }
-        } else {
-          console.error('Shadow root not found');
-        }
-      } else {
-        console.error('Chat div not found');
-      }
-    }
-
-    disableInput();
-  },
-};
-
-// Extension 3: FileUploadExtension
-const FileUploadExtension = {
-  name: 'FileUpload',
-  type: 'response',
-  match: ({ trace }) =>
-    trace.type === 'ext_fileUpload' || trace.payload.name === 'ext_fileUpload',
-  render: ({ trace, element }) => {
-    const fileUploadContainer = document.createElement('div');
-    fileUploadContainer.innerHTML = `
-      <style>
-        .my-file-upload {
-          border: 2px dashed rgba(87, 24, 54, 0.3);
-          padding: 20px;
-          text-align: center;
-          cursor: pointer;
-        }
-      </style>
-      <div class='my-file-upload'>Cick to upload a file</div>
-      <input type='file' style='display: none;'>
-    `;
-
-    const fileInput = fileUploadContainer.querySelector('input[type=file]');
-    const fileUploadBox = fileUploadContainer.querySelector('.my-file-upload');
-
-    fileUploadBox.addEventListener('click', function () {
-      fileInput.click();
-    });
-
-    fileInput.addEventListener('change', function () {
-      const file = fileInput.files[0];
-      console.log('File selected:', file);
-
-      fileUploadContainer.innerHTML = `
-        <img src="https://s3.amazonaws.com/com.voiceflow.studio/share/upload/upload.gif"
-             alt="Upload" width="50" height="50">
-      `;
-
-      var data = new FormData();
-      data.append('file', file);
-
-      fetch('https://tmpfiles.org/api/v1/upload', {
-        method: 'POST',
-        body: data,
-      })
-        .then((response) => {
-          if (response.ok) {
-            return response.json();
-          } else {
-            throw new Error('Upload failed: ' + response.statusText);
-          }
-        })
-        .then((result) => {
-          fileUploadContainer.innerHTML = `
-            <img src="https://s3.amazonaws.com/com.voiceflow.studio/share/check/check.gif"
-                 alt="Done" width="50" height="50">
-          `;
-          console.log('File uploaded:', result.data.url);
-          window.voiceflow.chat.interact({
-            type: 'complete',
-            payload: {
-              file: result.data.url.replace(
-                'https://tmpfiles.org/',
-                'https://tmpfiles.org/dl/'
-              ),
-            },
-          });
-        })
-        .catch((error) => {
-          console.error(error);
-          fileUploadContainer.innerHTML = '<div>Error during upload</div>';
-        });
-    });
-
-    element.appendChild(fileUploadContainer);
-  },
-};
-
 const FormExtension = {
   name: 'Forms',
   type: 'response',
   match: ({ trace }) =>
-    trace.type === 'Custom_Form' || trace.payload.name === 'Custom_Form',
+    trace.type === 'ext_form' || trace.payload.name === 'ext_form',
   render: ({ trace, element }) => {
-    // Create the form element
-    const formContainer = document.createElement('form');
+    const formContainer = document.createElement('form')
 
-    // Build the form HTML, including the file upload UI
     formContainer.innerHTML = `
       <style>
+        /* Container Styling */
+        form {
+          max-width: 400px;
+          margin: 0 auto;
+          padding: 20px;
+          border: 2px solid #EE2A1E;
+          border-radius: 10px;
+          background-color: #fff;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          font-family: Arial, sans-serif;
+        }
+
+        /* Label Styling */
         label {
-          font-size: 0.8em;
-          color: #888;
+          display: block;
+          font-size: 1em;
+          color: #EE2A1E;
+          margin-bottom: 5px;
+          font-weight: bold;
         }
-        input[type="text"], input[type="email"], textarea {
+
+        /* Input Fields Styling */
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"] {
           width: 100%;
-          border: none;
-          border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
-          background: transparent;
-          margin: 5px 0;
-          outline: none;
-          padding: 8px 0;
-          resize: vertical;
+          padding: 10px;
+          border: 1px solid #EE2A1E;
+          border-radius: 5px;
+          margin-bottom: 15px;
+          font-size: 1em;
+          transition: border-color 0.3s;
         }
+
+        /* Input Focus Styling */
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="tel"]:focus {
+          border-color: #d91914;
+          outline: none;
+          box-shadow: 0 0 5px rgba(238, 42, 30, 0.5);
+        }
+
+        /* Invalid Input Styling */
         .invalid {
           border-color: red;
         }
+
+        /* Submit Button Styling */
         .submit {
-          background: #632340;
+          background-color: #EE2A1E;
           border: none;
           color: white;
-          padding: 10px;
+          padding: 12px;
           border-radius: 5px;
           width: 100%;
+          font-size: 1em;
           cursor: pointer;
+          transition: background-color 0.3s, transform 0.2s;
         }
-        .my-file-upload {
-          border: 2px dashed rgba(87, 24, 54, 0.3);
-          padding: 20px;
-          text-align: center;
-          cursor: pointer;
-          margin-bottom: 10px;
+
+        /* Submit Button Hover Effect */
+        .submit:hover {
+          background-color: #d91914;
+          transform: translateY(-2px);
         }
-        .upload-status {
-          text-align: center;
-          margin-bottom: 10px;
+
+        /* Responsive Design */
+        @media (max-width: 500px) {
+          form {
+            padding: 15px;
+          }
+          .phone {
+            width: 100%;
+          }
         }
       </style>
 
-      <label for="email">Email</label>
-      <input type="email" class="email" name="email" required
-             pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
-             title="Invalid email address"><br><br>
+      <label for="name">Navn</label>
+      <input type="text" class="name" name="name" required placeholder="Ditt navn">
 
-      <label for="topic">Topic</label>
-      <input type="text" class="topic" name="topic" required><br><br>
+      <label for="email">E-post</label>
+      <input type="email" class="email" name="email" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Ugyldig e-postadresse" placeholder="du@example.com">
 
-      <label for="userQuestion">Question</label>
-      <textarea class="userQuestion" name="userQuestion" required></textarea><br><br>
+      <label for="phone">Telefonnummer</label>
+      <input type="tel" class="phone" name="phone" required pattern="\\d+" title="Ugyldig telefonnummer, vennligst oppgi kun tall" placeholder="1234567890">
 
-      <div class='my-file-upload'>Click here to upload any relevant screenshots</div>
-      <input type='file' class='file-input' style='display: none;'>
+      <input type="submit" class="submit" value="Send">
+    `
 
-      <div class="upload-status"></div>
-
-      <input type="submit" class="submit" value="Submit">
-    `;
-
-    // Get references to the inputs
-    const emailInput = formContainer.querySelector('.email');
-    const topicInput = formContainer.querySelector('.topic');
-    const userQuestionInput = formContainer.querySelector('.userQuestion');
-    const fileInput = formContainer.querySelector('.file-input');
-    const fileUploadBox = formContainer.querySelector('.my-file-upload');
-    const uploadStatusDiv = formContainer.querySelector('.upload-status');
-    const submitButton = formContainer.querySelector('.submit');
-
-    // Prefill the form fields with the variables from trace.payload
-    emailInput.value = trace.payload.email || '';
-    topicInput.value = trace.payload.topic || '';
-    userQuestionInput.value = trace.payload.userQuestion || '';
-
-    // Variable to store the selected file
-    let selectedFile = null;
-    let fileUrl = null;
-
-    // Variable to store original value descriptor
-    let originalValueDescriptor = null;
-
-    // File upload click handler
-    fileUploadBox.addEventListener('click', function () {
-      fileInput.click();
-    });
-
-    // File input change handler
-    fileInput.addEventListener('change', function () {
-      selectedFile = fileInput.files[0];
-      if (selectedFile) {
-        // Show file name in the UI
-        fileUploadBox.textContent = 'File selected: ' + selectedFile.name;
-      } else {
-        fileUploadBox.textContent = 'Click here to upload any relevant screenshots';
-      }
-    });
-
-    // Form input validation
-    formContainer.addEventListener('input', function () {
-      // Remove 'invalid' class when input becomes valid
-      if (emailInput.checkValidity()) emailInput.classList.remove('invalid');
-      if (topicInput.checkValidity()) topicInput.classList.remove('invalid');
-      if (userQuestionInput.checkValidity()) userQuestionInput.classList.remove('invalid');
-    });
-
-    // Function to disable or enable the chat input
-    function disableInput(isDisabled) {
-      const chatDiv = document.getElementById('voiceflow-chat');
-
-      if (chatDiv) {
-        const shadowRoot = chatDiv.shadowRoot;
-        if (shadowRoot) {
-          const chatInput = shadowRoot.querySelector('.vfrc-chat-input');
-          const textarea = shadowRoot.querySelector(
-            'textarea[id^="vf-chat-input--"]'
-          );
-          const button = shadowRoot.querySelector('.vfrc-chat-input--button');
-
-          if (chatInput && textarea && button) {
-            // Add a style tag if it doesn't exist
-            let styleTag = shadowRoot.querySelector('#vf-disable-input-style');
-            if (!styleTag) {
-              styleTag = document.createElement('style');
-              styleTag.id = 'vf-disable-input-style';
-              styleTag.textContent = `
-                .vf-no-border, .vf-no-border * {
-                  border: none !important;
-                }
-                .vf-hide-button {
-                  display: none !important;
-                }
-              `;
-              shadowRoot.appendChild(styleTag);
-            }
-
-            if (originalValueDescriptor === null) {
-              // Store original value descriptor only once
-              originalValueDescriptor = Object.getOwnPropertyDescriptor(
-                Object.getPrototypeOf(textarea),
-                'value'
-              );
-            }
-
-            function updateInputState() {
-              textarea.disabled = isDisabled;
-              if (!isDisabled) {
-                textarea.placeholder = 'Message...';
-                chatInput.classList.remove('vf-no-border');
-                button.classList.remove('vf-hide-button');
-                // Restore original value getter/setter
-                if (originalValueDescriptor) {
-                  Object.defineProperty(
-                    textarea,
-                    'value',
-                    originalValueDescriptor
-                  );
-                }
-              } else {
-                textarea.placeholder = '';
-                chatInput.classList.add('vf-no-border');
-                button.classList.add('vf-hide-button');
-                if (originalValueDescriptor) {
-                  Object.defineProperty(textarea, 'value', {
-                    get: function () {
-                      return '';
-                    },
-                    configurable: true,
-                  });
-                }
-              }
-
-              // Trigger events to update component state
-              textarea.dispatchEvent(
-                new Event('input', { bubbles: true, cancelable: true })
-              );
-              textarea.dispatchEvent(
-                new Event('change', { bubbles: true, cancelable: true })
-              );
-            }
-
-            // Update input state
-            updateInputState();
-          } else {
-            console.error('Chat input, textarea, or button not found');
-          }
-        } else {
-          console.error('Shadow root not found');
-        }
-      } else {
-        console.error('Chat div not found');
-      }
-    }
-
-    // Disable the chat input when the form is rendered
-    disableInput(true);
-
-    // Form submit handler
     formContainer.addEventListener('submit', function (event) {
-      event.preventDefault();
+      event.preventDefault()
 
+      const name = formContainer.querySelector('.name')
+      const email = formContainer.querySelector('.email')
+      const phone = formContainer.querySelector('.phone')
+
+      // Remove previous invalid classes
+      name.classList.remove('invalid')
+      email.classList.remove('invalid')
+      phone.classList.remove('invalid')
+
+      // Validate inputs
       if (
-        !emailInput.checkValidity() ||
-        !topicInput.checkValidity() ||
-        !userQuestionInput.checkValidity()
+        !name.checkValidity() ||
+        !email.checkValidity() ||
+        !phone.checkValidity()
       ) {
-        if (!emailInput.checkValidity()) emailInput.classList.add('invalid');
-        if (!topicInput.checkValidity()) topicInput.classList.add('invalid');
-        if (!userQuestionInput.checkValidity()) userQuestionInput.classList.add('invalid');
-        return;
+        if (!name.checkValidity()) name.classList.add('invalid')
+        if (!email.checkValidity()) email.classList.add('invalid')
+        if (!phone.checkValidity()) phone.classList.add('invalid')
+        return
       }
 
-      // Disable submit button to prevent multiple submissions and remove it after submit
-      submitButton.disabled = true;
-      submitButton.style.display = 'none';
+      formContainer.querySelector('.submit').disabled = true
+      formContainer.querySelector('.submit').value = 'Sender...'
 
-      // Function to send form data to Voiceflow
-      const submitFormData = (fileUrl) => {
-        window.voiceflow.chat.interact({
-          type: 'complete',
-          payload: {
-            email: emailInput.value,
-            topic: topicInput.value,
-            userQuestion: userQuestionInput.value,
-            file: fileUrl || null,
-          },
-        });
+      window.voiceflow.chat.interact({
+        type: 'complete',
+        payload: { name: name.value, email: email.value, phone: phone.value },
+      }).then(() => {
+        formContainer.innerHTML = `
+          <p style="color: #EE2A1E; text-align: center; font-weight: bold;">Takk for at du sendte inn skjemaet!</p>
+        `
+      }).catch(() => {
+        formContainer.querySelector('.submit').disabled = false
+        formContainer.querySelector('.submit').value = 'Send'
+        alert('Det oppstod en feil ved innsending av skjemaet. Vennligst prøv igjen.')
+      })
+    })
 
-        // Re-enable the chat input after submission
-        disableInput(false);
-      };
-
-      // If a file is selected, upload it first
-      if (selectedFile) {
-        uploadStatusDiv.innerHTML = `
-          <img src="https://s3.amazonaws.com/com.voiceflow.studio/share/upload/upload.gif"
-               alt="Uploading" width="50" height="50">
-        `;
-
-        var data = new FormData();
-        data.append('file', selectedFile);
-
-        fetch('https://tmpfiles.org/api/v1/upload', {
-          method: 'POST',
-          body: data,
-        })
-          .then((response) => {
-            if (response.ok) {
-              return response.json();
-            } else {
-              throw new Error('Upload failed: ' + response.statusText);
-            }
-          })
-          .then((result) => {
-            uploadStatusDiv.innerHTML = ''; // Clear the upload status after submission
-            fileUrl = result.data.url.replace('https://tmpfiles.org/', 'https://tmpfiles.org/dl/');
-            // Submit the form data with file URL
-            submitFormData(fileUrl);
-          })
-          .catch((error) => {
-            console.error(error);
-            uploadStatusDiv.innerHTML = '<div>Error during file upload</div>';
-            // Submit the form data without file URL
-            submitFormData(null);
-          });
-      } else {
-        // No file selected, submit the form data directly
-        submitFormData(null);
-      }
-    });
-
-    element.appendChild(formContainer);
+    element.appendChild(formContainer)
   },
-};
-
-
-
-window.voiceflowExtensions = [
-    VideoExtension,
-    DisableInputExtension,
-    FileUploadExtension,
-    FormExtension
-];
+}
