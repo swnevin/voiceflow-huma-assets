@@ -1,4 +1,4 @@
-export const FormExtension = {
+const FormExtension = {
   name: 'Forms',
   type: 'response',
   match: ({ trace }) =>
