@@ -484,8 +484,6 @@ const FormExtension = {
 
 
 
-
-
 window.voiceflowExtensions = [
     VideoExtension,
     DisableInputExtension,
