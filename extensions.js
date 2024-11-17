@@ -482,45 +482,6 @@ const FormExtension = {
   },
 };
 
-export const HubSpotFormExtension = {
-  name: 'HubSpotForm',
-  type: 'response',
-  match: ({ trace }) => trace.type === 'hubspot_form' || trace.payload.name === 'hubspot_form',
-  render: ({ trace, element }) => {
-    console.log('Rendering HubSpot form...');
-
-    // Create a container for the HubSpot form
-    const formContainer = document.createElement('div');
-    formContainer.id = 'hubspot-form-container';
-
-    // Append the container to the chat widget element
-    element.appendChild(formContainer);
-
-    // Inject the HubSpot form script and initialize the form
-    const script = document.createElement('script');
-    script.charset = 'utf-8';
-    script.type = 'text/javascript';
-    script.src = '//js-eu1.hsforms.net/forms/embed/v2.js';
-
-    script.onload = () => {
-      console.log('HubSpot script loaded, initializing form...');
-      hbspt.forms.create({
-        portalId: '145343433',
-        formId: '1823b491-d507-414a-8e43-55396faa652a',
-        target: '#hubspot-form-container'
-      });
-    };
-
-    script.onerror = () => {
-      console.error('Failed to load HubSpot script.');
-    };
-
-    document.body.appendChild(script);
-
-    console.log('HubSpot form script appended to document.');
-  }
-};
-
 
 
 
@@ -529,6 +490,5 @@ window.voiceflowExtensions = [
     VideoExtension,
     DisableInputExtension,
     FileUploadExtension,
-    FormExtension,
-    HubSpotFormExtension
+    FormExtension
 ];
