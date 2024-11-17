@@ -482,11 +482,55 @@ const FormExtension = {
   },
 };
 
+const FormEmbedExtension = {
+  name: 'FormEmbed',
+  type: 'response',
+  match: ({ trace }) =>
+    trace.type === 'form_embed' || trace.payload.name === 'form_embed',
+  render: ({ trace, element }) => {
+    console.log('Rendering the embedded form...');
+
+    // Create a container for the form
+    const formContainer = document.createElement('div');
+    formContainer.id = `embedded-form-${trace.payload.id || 'default'}`;
+
+    // Append the form container to the element
+    element.appendChild(formContainer);
+
+    // Embed the form script
+    const script = document.createElement('script');
+    script.charset = 'utf-8';
+    script.type = 'text/javascript';
+    script.src = '//js-eu1.hsforms.net/forms/embed/v2.js';
+
+    script.onload = () => {
+      console.log('Form script loaded successfully.');
+      if (window.hbspt && window.hbspt.forms) {
+        window.hbspt.forms.create({
+          portalId: '145343433',
+          formId: '1823b491-d507-414a-8e43-55396faa652a',
+          target: `#${formContainer.id}`,
+        });
+      } else {
+        console.error('HubSpot form script failed to initialize.');
+      }
+    };
+
+    script.onerror = () => {
+      console.error('Error loading the form embed script.');
+    };
+
+    document.body.appendChild(script);
+  },
+};
+
+
 
 
 window.voiceflowExtensions = [
     VideoExtension,
     DisableInputExtension,
     FileUploadExtension,
-    FormExtension
+    FormExtension,
+    FormEmbedExtension
 ];
