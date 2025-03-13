@@ -1,3 +1,8 @@
 :host {
   --fonts-default: inherit;
 }
+
+.vfrc-chat-input {
+  background-color: white !important;
+  color: black !important;
+}
