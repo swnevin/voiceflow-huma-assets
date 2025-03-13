@@ -488,6 +488,6 @@ window.voiceflowExtensions = [
     VideoExtension,
     DisableInputExtension,
     FileUploadExtension,
-    FormExtension
+    FormExtension,
 ];
 
